@@ -1,0 +1,24 @@
+---
+- hosts: test
+  tasks:
+    - name: generate 10 empty files
+      file:
+        src: "/root/file{{ item }}"
+        state: touch
+      delegate_to: localhost
+      with_sequence: start=10 end=20
+    - name: Create a zip archive
+      archive:
+        src: /root/file*
+        dest: /root/files.zip
+        format: zip
+      delegate_to: localhost
+    - name: Copy Zip file to slave machines
+      copy:
+        src: /root/files.zip
+        dest: /root/
+    - name:  a unzip archive
+      unarchive:
+        src: /root/files.zip
+        dest: /opt/
+        remote_src: yes
